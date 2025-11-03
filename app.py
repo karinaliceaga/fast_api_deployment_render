@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 user_data={
-    1:{"name": "naji","age":30},
-    2:{"name":"john","age":25}
+    1:{"name": "Camila","age":23},
+    2:{"name":"Adrian","age":21}
 }
 
 class User(BaseModel):
