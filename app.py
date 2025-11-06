@@ -1,34 +1,37 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-user_data={
-    1:{"name": "Camila","age":23},
-    2:{"name":"Adrian","age":21}
-}
+app = FastAPI(title="Number Multiplier API", version="1.0.0")
 
-class User(BaseModel):
-    name:str
-    age:int
+# Pydantic model for input validation
+class MultiplyRequest(BaseModel):
+    number: float
 
-app = FastAPI()
+# Simple multiplication endpoint
+@app.post("/multiply")
+def multiply_number(request: MultiplyRequest):
+    result = request.number * 2
+    return {
+        "input_number": request.number,
+        "multiplied_by": 2,
+        "result": result
+    }
 
-@app.get("/users")
-def get_userinfo():
-    return user_data
+# Alternative GET version (if you prefer)
+@app.get("/multiply/{number}")
+def multiply_number_get(number: float):
+    result = number * 2
+    return {
+        "input_number": number,
+        "multiplied_by": 2,
+        "result": result
+    }
 
-@app.put("/user/{user_id}")
-def update_userinfo(user_id: int, input_data: User):
+# Keep a simple health check
+@app.get("/")
+def read_root():
+    return {"message": "Number Multiplier API is running!"}
 
-    if user_id in user_data:
-        user_data[user_id]= input_data.model_dump()
-        return {"message":"successfully updated the user record"}
-    else:
-        return{"message":"failed to update the user record"}
-
-@app.delete("/user/{user_id}")
-def delete_userinfo(user_id: int):
-    if user_id in user_data:
-        del user_data[user_id]
-        return {"message":"successfully deleted the record"}
-    else:
-        return{"message":"failed to delete the record"}
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
