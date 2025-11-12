@@ -21,6 +21,11 @@ class QuadraticRequest(BaseModel):
     b: float
     c: float
 
+# Add this to handle the base URL accessed via a web browser
+@app.get("/")
+def read_root():
+    return {"message": "Quadratic Solver API is running. Access /solve via POST."}
+
 #Endpoint for quadratic equation
 @app.post("/solve")
 def solve_quadratic(request: QuadraticRequest):

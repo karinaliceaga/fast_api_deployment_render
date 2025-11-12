@@ -1,6 +1,6 @@
 class QuadraticSolver {
     constructor() {
-        this.apiUrl = 'https://fast-api-deployment-304955833763.northamerica-south1.run.app'; // backend Google Cloud URL
+        this.apiUrl = 'https://fast-api-deployment-304955833763.northamerica-south1.run.app/docs'; // backend Google Cloud URL
         this.chart = null;
         this.initializeEventListeners();
     }
