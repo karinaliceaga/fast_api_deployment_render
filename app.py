@@ -55,24 +55,18 @@ def solve_quadratic(request: QuadraticRequest):
 def health_check():
     return {"status": "healthy"}
 
-# Add a GET endpoint for testing
+# Add a simple GET endpoint that explains how to use the API
 @app.get("/solve")
-def solve_quadratic_get(a: float, b: float, c: float):
-    discriminant = b ** 2 - 4 * a * c
-    
-    if discriminant >= 0:
-        root1 = (-b + math.sqrt(discriminant)) / (2 * a)
-        root2 = (-b - math.sqrt(discriminant)) / (2 * a)
-        return {"roots": [root1, root2]}
-    else:
-        real_part = -b / (2 * a)
-        imaginary_part = math.sqrt(-discriminant) / (2 * a)
-        return {
-            "roots": [
-                f"{real_part} + {imaginary_part}i",
-                f"{real_part} - {imaginary_part}i"
-            ]
-        }
+def solve_info():
+    return {
+        "message": "This endpoint requires a POST request with JSON data",
+        "example_request": {
+            "a": 1,
+            "b": -3,
+            "c": 2
+        },
+        "example_curl": 'curl -X POST -H "Content-Type: application/json" -d \'{"a":1,"b":-3,"c":2}\' http://your-url/solve'
+    }
 
 if __name__ == "__main__":
     import uvicorn
