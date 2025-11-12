@@ -1,9 +1,19 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import math
+from fastapi.middleware.cors import CORSMiddleware
 
 #Create the FastAPI application instance
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # For production, replace with your Firebase URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 #Define data model fr request validation
 class QuadraticRequest(BaseModel):
@@ -29,3 +39,8 @@ def solve_quadratic(request: QuadraticRequest):
                 f"{real_part} - {imaginary_part}i"
             ]
         }
+
+# Health check - for monitoring systems
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
