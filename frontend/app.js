@@ -1,9 +1,7 @@
 class QuadraticSolver {
     constructor() {
-        // UPDATE THIS URL to your actual backend URL
-        // For local testing: "http://localhost:8000"
-        // For deployed backend: "https://your-backend-url.com"
-        this.apiUrl = 'https://fast-api-deployment-304955833763.northamerica-south1.run.app/solve'; // Change this to your actual backend URL
+        this.apiUrl = 'https://fast-api-deployment-304955833763.northamerica-south1.run.app/solve';
+        console.log('API URL set to:', this.apiUrl); 
         this.chart = null;
         this.initializeEventListeners();
     }
@@ -20,7 +18,6 @@ class QuadraticSolver {
         const b = parseFloat(document.getElementById('b').value);
         const c = parseFloat(document.getElementById('c').value);
 
-        // Validate inputs
         if (isNaN(a) || isNaN(b) || isNaN(c)) {
             this.showError('Please enter valid numbers for all coefficients.');
             return;
@@ -31,17 +28,14 @@ class QuadraticSolver {
             return;
         }
 
-        // Hide previous results/errors
         this.hideElement('error');
         this.hideElement('results');
-
-        // Show loading state
         this.showLoading();
 
         try {
-            console.log('Sending request to:', `${this.apiUrl}/solve`);
+            console.log('Sending request to:', this.apiUrl);
             
-            const response = await fetch(`${this.apiUrl}/solve`, {
+            const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -52,18 +46,16 @@ class QuadraticSolver {
             console.log('Response status:', response.status);
 
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Server response:', errorText);
-                throw new Error(`Server error: ${response.status} - ${errorText}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log('Received data:', data);
-            
+            console.log('Success! Data:', data);
             this.displayResults(data.roots, a, b, c);
+            
         } catch (error) {
-            console.error('Error details:', error);
-            this.showError(`Failed to calculate roots: ${error.message}. Please check that the backend server is running and accessible.`);
+            console.error('Error:', error);
+            this.showError(`Failed to calculate roots: ${error.message}`);
         } finally {
             this.hideLoading();
         }
@@ -71,15 +63,11 @@ class QuadraticSolver {
 
     displayResults(roots, a, b, c) {
         const rootsElement = document.getElementById('roots');
-        
-        // Format roots for display
         let rootsHTML = '<strong>Roots:</strong><br>';
         roots.forEach((root, index) => {
             rootsHTML += `Root ${index + 1}: ${root}<br>`;
         });
-        
         rootsElement.innerHTML = rootsHTML;
-        
         this.showElement('results');
         this.plotGraph(a, b, c, roots);
     }
@@ -87,12 +75,10 @@ class QuadraticSolver {
     plotGraph(a, b, c, roots) {
         const ctx = document.getElementById('quadraticChart').getContext('2d');
         
-        // Destroy previous chart if it exists
         if (this.chart) {
             this.chart.destroy();
         }
 
-        // Generate data points
         const { data, labels } = this.generateDataPoints(a, b, c, roots);
 
         this.chart = new Chart(ctx, {
@@ -106,45 +92,15 @@ class QuadraticSolver {
                     backgroundColor: 'rgba(102, 126, 234, 0.1)',
                     borderWidth: 3,
                     fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#ff6b6b',
-                    pointBorderColor: '#ff6b6b',
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+                    tension: 0.4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'x'
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'f(x)'
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    }
+                    x: { title: { display: true, text: 'x' } },
+                    y: { title: { display: true, text: 'f(x)' } }
                 }
             }
         });
@@ -153,34 +109,15 @@ class QuadraticSolver {
     generateDataPoints(a, b, c, roots) {
         const data = [];
         const labels = [];
-        
-        // Determine range based on roots
         let minX = -10;
         let maxX = 10;
-        
-        // Extract real roots for range calculation
-        const realRoots = roots.map(root => {
-            if (typeof root === 'number') return root;
-            // Handle complex roots - just use real part
-            const match = root.toString().match(/^(-?\d+\.?\d*)/);
-            return match ? parseFloat(match[1]) : 0;
-        }).filter(root => !isNaN(root));
-
-        if (realRoots.length > 0) {
-            const rootMin = Math.min(...realRoots);
-            const rootMax = Math.max(...realRoots);
-            minX = Math.min(minX, rootMin - 3);
-            maxX = Math.max(maxX, rootMax + 3);
-        }
 
         const step = (maxX - minX) / 100;
-        
         for (let x = minX; x <= maxX; x += step) {
             const y = a * x * x + b * x + c;
             data.push(y);
             labels.push(x.toFixed(2));
         }
-
         return { data, labels };
     }
 
@@ -211,7 +148,6 @@ class QuadraticSolver {
     }
 }
 
-// Initialize the application when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     new QuadraticSolver();
 });

@@ -9,7 +9,7 @@ app = FastAPI()
 # Add CORS middleware - CRITICAL for frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://quadraticapi.web.app"],  # For now - change to your Firebase URL in production
+    allow_origins=["*"],  # For now - change to your Firebase URL in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
