@@ -3,7 +3,7 @@ class QuadraticSolver {
         // UPDATE THIS URL to your actual backend URL
         // For local testing: "http://localhost:8000"
         // For deployed backend: "https://your-backend-url.com"
-        this.apiUrl = 'https://fast-api-deployment-304955833763.northamerica-south1.run.app'; // Change this to your actual backend URL
+        this.apiUrl = 'https://fast-api-deployment-304955833763.northamerica-south1.run.app/solve'; // Change this to your actual backend URL
         this.chart = null;
         this.initializeEventListeners();
     }

@@ -3,35 +3,30 @@ from pydantic import BaseModel
 import math
 from fastapi.middleware.cors import CORSMiddleware
 
-# Create the FastAPI application instance
+#Create the FastAPI application instance
 app = FastAPI()
 
-# Configure CORS - UPDATE THESE ORIGINS WITH YOUR ACTUAL URLs
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://127.0.0.1",
-    "http://127.0.0.1:8000",
-    "https://https://quadraticapi.web.app/",  # Replace with your actual Firebase URL
-    "https://console.firebase.google.com/project/quadraticapi/overview",  # Replace with your actual Firebase URL
-    "*"  # For testing only - remove in production
-]
-
+# Add CORS middleware - CRITICAL for frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["https://quadraticapi.web.app"],  # For now - change to your Firebase URL in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Define data model for request validation
+#Define data model for request validation
 class QuadraticRequest(BaseModel):
     a: float
     b: float
     c: float
 
-# Endpoint for quadratic equation
+# Root endpoint - fixes the "Not Found" error
+@app.get("/")
+def read_root():
+    return {"message": "Quadratic Equation API", "status": "active"}
+
+#Endpoint for quadratic equation
 @app.post("/solve")
 def solve_quadratic(request: QuadraticRequest):
     discriminant = request.b ** 2 - 4 * request.a * request.c
@@ -54,20 +49,3 @@ def solve_quadratic(request: QuadraticRequest):
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
-
-# Add a simple GET endpoint that explains how to use the API
-@app.get("/solve")
-def solve_info():
-    return {
-        "message": "This endpoint requires a POST request with JSON data",
-        "example_request": {
-            "a": 1,
-            "b": -3,
-            "c": 2
-        },
-        "example_curl": 'curl -X POST -H "Content-Type: application/json" -d \'{"a":1,"b":-3,"c":2}\' http://your-url/solve'
-    }
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
