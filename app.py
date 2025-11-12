@@ -3,30 +3,35 @@ from pydantic import BaseModel
 import math
 from fastapi.middleware.cors import CORSMiddleware
 
-#Create the FastAPI application instance
+# Create the FastAPI application instance
 app = FastAPI()
 
-# Add CORS middleware
+# Configure CORS - UPDATE THESE ORIGINS WITH YOUR ACTUAL URLs
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+    "http://127.0.0.1",
+    "http://127.0.0.1:8000",
+    "https://https://quadraticapi.web.app/",  # Replace with your actual Firebase URL
+    "https://console.firebase.google.com/project/quadraticapi/overview",  # Replace with your actual Firebase URL
+    "*"  # For testing only - remove in production
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For production, replace with your Firebase URL
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-#Define data model fr request validation
+# Define data model for request validation
 class QuadraticRequest(BaseModel):
     a: float
     b: float
     c: float
 
-# Add this to handle the base URL accessed via a web browser
-@app.get("/")
-def read_root():
-    return {"message": "Quadratic Solver API is running. Access /solve via POST."}
-
-#Endpoint for quadratic equation
+# Endpoint for quadratic equation
 @app.post("/solve")
 def solve_quadratic(request: QuadraticRequest):
     discriminant = request.b ** 2 - 4 * request.a * request.c
@@ -49,3 +54,26 @@ def solve_quadratic(request: QuadraticRequest):
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
+# Add a GET endpoint for testing
+@app.get("/solve")
+def solve_quadratic_get(a: float, b: float, c: float):
+    discriminant = b ** 2 - 4 * a * c
+    
+    if discriminant >= 0:
+        root1 = (-b + math.sqrt(discriminant)) / (2 * a)
+        root2 = (-b - math.sqrt(discriminant)) / (2 * a)
+        return {"roots": [root1, root2]}
+    else:
+        real_part = -b / (2 * a)
+        imaginary_part = math.sqrt(-discriminant) / (2 * a)
+        return {
+            "roots": [
+                f"{real_part} + {imaginary_part}i",
+                f"{real_part} - {imaginary_part}i"
+            ]
+        }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
